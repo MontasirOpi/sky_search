@@ -9,7 +9,7 @@ import 'package:sky_search/screens/searchScreen/widgets/passenger_section_bottom
 import 'package:sky_search/screens/searchScreen/widgets/payment_section.dart';
 
 class FlightSearchScreen extends StatelessWidget {
-  const FlightSearchScreen({Key? key}) : super(key: key);
+  const FlightSearchScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -41,10 +41,7 @@ class FlightSearchScreen extends StatelessWidget {
               const SizedBox(height: 12),
               _buildPaymentCard(),
               const SizedBox(height: 12),
-              _buildCurrencyCard(),
-              const SizedBox(height: 16),
-              _buildTagButtons(),
-              const SizedBox(height: 24),
+
               _buildSearchButton(context, state),
             ],
           ),
@@ -104,57 +101,33 @@ class FlightSearchScreen extends StatelessWidget {
     );
   }
 
-  // -------------------- CURRENCY CARD --------------------
-  Widget _buildCurrencyCard() {
-    return _sectionCard(
-      child: ListTile(
-        title: const Text(
-          'Currency',
-          style: TextStyle(fontSize: 13, color: Colors.grey),
-        ),
-        subtitle: const Text(
-          'taka',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        trailing: const Icon(Icons.chevron_right),
-      ),
-    );
-  }
-
-  // -------------------- TAG BUTTONS --------------------
-  Widget _buildTagButtons() {
-    return Wrap(
-      spacing: 8,
-      children: [
-        _chip('6Exclusive'),
-        _chip('Students'),
-        _chip('Family & Friends'),
-      ],
-    );
-  }
-
-  Widget _chip(String label) {
-    return Chip(
-      label: Text(label),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      backgroundColor: Colors.grey[200],
-    );
-  }
-
   // -------------------- SEARCH BUTTON --------------------
   Widget _buildSearchButton(BuildContext context, FlightSearchState state) {
-    return SizedBox(
-      width: double.infinity,
-      height: 50,
-      child: ElevatedButton.icon(
-        onPressed: () => _searchFlights(context, state),
-        icon: const Icon(Icons.search),
-        label: const Text('Search Flights'),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.blue,
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+    bool allFieldsFilled =
+        state.fromAirport != null &&
+        state.toAirport != null &&
+        state.departureDate != null;
+    return Center(
+      child: SizedBox(
+        width: 200,
+        height: 50,
+        child: ElevatedButton.icon(
+          onPressed: allFieldsFilled
+              ? () => _searchFlights(context, state)
+              : null,
+
+          label: Text(
+            'Search',
+            style: TextStyle(
+              color: allFieldsFilled ? Colors.white : Colors.black38,
+            ),
+          ),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.blue,
+            foregroundColor: Colors.grey,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30),
+            ),
           ),
         ),
       ),
@@ -215,6 +188,17 @@ class FlightSearchScreen extends StatelessWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please fill all fields'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    // Prevent searching when from and to are the same
+    if (state.fromAirport!.code == state.toAirport!.code) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Departure and destination cannot be the same'),
           backgroundColor: Colors.red,
         ),
       );

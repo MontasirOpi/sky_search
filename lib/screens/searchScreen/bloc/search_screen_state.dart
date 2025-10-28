@@ -9,6 +9,7 @@ class FlightSearchState extends Equatable {
   final int passengers;
   final bool loading;
   final String? error;
+  final String? payWith;
 
   const FlightSearchState({
     this.airports = const [],
@@ -18,6 +19,7 @@ class FlightSearchState extends Equatable {
     this.passengers = 1,
     this.loading = false,
     this.error,
+    this.payWith,
   });
 
   FlightSearchState copyWith({
@@ -28,6 +30,7 @@ class FlightSearchState extends Equatable {
     int? passengers,
     bool? loading,
     String? error,
+    String? payWith,
   }) {
     return FlightSearchState(
       airports: airports ?? this.airports,
@@ -37,6 +40,7 @@ class FlightSearchState extends Equatable {
       passengers: passengers ?? this.passengers,
       loading: loading ?? this.loading,
       error: error,
+      payWith: payWith ?? this.payWith,
     );
   }
 
@@ -49,5 +53,6 @@ class FlightSearchState extends Equatable {
     passengers,
     loading,
     error,
+    payWith,
   ];
 }
