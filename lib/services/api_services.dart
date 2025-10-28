@@ -28,7 +28,7 @@ class AirportService {
       if (response.statusCode == 200) {
         try {
           final List<dynamic> data = json.decode(response.body);
-          developer.log('✅ Successfully parsed ${data.length} airports');
+          developer.log('Successfully parsed ${data.length} airports');
 
           if (data.isEmpty) {
             developer.log('⚠️ Warning: API returned empty array');
@@ -37,14 +37,14 @@ class AirportService {
 
           // Log first airport for debugging
           if (data.isNotEmpty) {
-            developer.log('📍 First airport sample: ${data[0]}');
+            developer.log('First airport sample: ${data[0]}');
           }
 
           final airports = data.map((json) {
             try {
               return Airport.fromJson(json as Map<String, dynamic>);
             } catch (e) {
-              developer.log('❌ Error parsing airport: $json - Error: $e');
+              developer.log('Error parsing airport: $json - Error: $e');
               rethrow;
             }
           }).toList();
@@ -52,17 +52,17 @@ class AirportService {
           developer.log('🎉 Successfully loaded ${airports.length} airports');
           return airports;
         } catch (e, stackTrace) {
-          developer.log('❌ JSON Parse Error: $e');
+          developer.log('JSON Parse Error: $e');
           developer.log('Stack: $stackTrace');
           throw Exception('Failed to parse airport data: $e');
         }
       } else {
-        developer.log('❌ HTTP Error: ${response.statusCode}');
+        developer.log(' HTTP Error: ${response.statusCode}');
         developer.log('Response body: ${response.body}');
         throw Exception('Server returned ${response.statusCode}');
       }
     } catch (e, stackTrace) {
-      developer.log('💥 Fatal Error in fetchAirports: $e');
+      developer.log('Fatal Error in fetchAirports: $e');
       developer.log('Stack trace: $stackTrace');
       rethrow;
     }
