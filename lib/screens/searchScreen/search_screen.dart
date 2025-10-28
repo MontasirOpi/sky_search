@@ -4,8 +4,9 @@ import 'package:intl/intl.dart';
 import 'package:sky_search/screens/searchScreen/bloc/search_screen_bloc.dart';
 import 'package:sky_search/screens/searchScreen/bloc/search_screen_event.dart';
 import 'package:sky_search/screens/searchScreen/bloc/search_screen_state.dart';
-
-import 'package:sky_search/widgets/airport_selector_widget.dart';
+import 'package:sky_search/screens/searchScreen/widgets/flight_info_card.dart';
+import 'package:sky_search/screens/searchScreen/widgets/passenger_section_bottom_sheet.dart';
+import 'package:sky_search/screens/searchScreen/widgets/payment_section.dart';
 
 class FlightSearchScreen extends StatelessWidget {
   const FlightSearchScreen({Key? key}) : super(key: key);
@@ -21,222 +22,192 @@ class FlightSearchScreen extends StatelessWidget {
         }
 
         return Scaffold(
+          backgroundColor: Colors.grey[100],
           appBar: AppBar(
             title: const Text('SkySearch ✈'),
-            backgroundColor: const Color(0xFF0047AB),
+            centerTitle: true,
+            backgroundColor: Colors.white,
+            foregroundColor: Colors.black87,
+            elevation: 0,
           ),
-          body: Padding(
+          body: ListView(
             padding: const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                AirportSelector(
-                  label: 'From',
-                  icon: Icons.flight_takeoff,
-                  selectedAirport: state.fromAirport,
-                  airports: state.airports,
-                  onSelect: (a) => context.read<FlightSearchBloc>().add(
-                    SelectFromAirport(a),
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.swap_vert, color: Color(0xFF0047AB)),
-                  onPressed: () =>
-                      context.read<FlightSearchBloc>().add(SwapAirports()),
-                ),
-                AirportSelector(
-                  label: 'To',
-                  icon: Icons.flight_land,
-                  selectedAirport: state.toAirport,
-                  airports: state.airports,
-                  onSelect: (a) =>
-                      context.read<FlightSearchBloc>().add(SelectToAirport(a)),
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        margin: const EdgeInsets.only(right: 6),
-                        child: _buildCompactOptionTile(
-                          icon: Icons.calendar_today,
-                          title: 'Departure Date',
-                          value: state.departureDate == null
-                              ? 'Select date'
-                              : DateFormat(
-                                  'dd MMM yyyy',
-                                ).format(state.departureDate!),
-                          onTap: () async {
-                            final picked = await showDatePicker(
-                              context: context,
-                              initialDate:
-                                  state.departureDate ??
-                                  DateTime.now().add(const Duration(days: 1)),
-                              firstDate: DateTime.now(),
-                              lastDate: DateTime.now().add(
-                                const Duration(days: 365),
-                              ),
-                            );
-                            if (picked != null) {
-                              context.read<FlightSearchBloc>().add(
-                                SelectDate(picked),
-                              );
-                            }
-                          },
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: Container(
-                        margin: const EdgeInsets.only(left: 6),
-                        child: _buildCompactOptionTile(
-                          icon: Icons.person,
-                          title: 'Passengers',
-                          value: '${state.passengers}',
-                          onTap: () =>
-                              _showPassengerSelector(context, state.passengers),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-                Spacer(),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    onPressed: () => _searchFlights(context, state),
-                    icon: const Icon(Icons.search, color: Colors.white),
-                    label: const Text(
-                      'Search Flights',
-                      style: TextStyle(color: Colors.white, fontSize: 16),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF0047AB),
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+            children: [
+              FlightInfoCard(state: state),
+              const SizedBox(height: 12),
+              _buildDateCard(context, state),
+              const SizedBox(height: 12),
+              _buildPassengerCard(context, state),
+              const SizedBox(height: 12),
+              _buildPaymentCard(),
+              const SizedBox(height: 12),
+              _buildCurrencyCard(),
+              const SizedBox(height: 16),
+              _buildTagButtons(),
+              const SizedBox(height: 24),
+              _buildSearchButton(context, state),
+            ],
           ),
         );
       },
     );
   }
 
-  Widget _buildCompactOptionTile({
-    required IconData icon,
-    required String title,
-    required String value,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        decoration: BoxDecoration(
-          color: Colors.grey[100],
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade300),
+  // -------------------- DATE CARD --------------------
+  Widget _buildDateCard(BuildContext context, FlightSearchState state) {
+    return _sectionCard(
+      child: ListTile(
+        onTap: () => _pickDate(context, state),
+        title: const Text(
+          'Departure',
+          style: TextStyle(fontSize: 13, color: Colors.grey),
         ),
-        child: Row(
-          children: [
-            Icon(icon, color: const Color(0xFF0047AB), size: 22),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(fontSize: 12, color: Colors.grey),
-                  ),
-                  Text(
-                    value,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-          ],
+        subtitle: Text(
+          state.departureDate == null
+              ? 'Select date'
+              : DateFormat('dd MMM').format(state.departureDate!),
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
+        trailing: const Icon(Icons.calendar_today_outlined, color: Colors.blue),
       ),
     );
   }
 
-  void _showPassengerSelector(BuildContext context, int currentPassengers) {
-    int selectedPassengers = currentPassengers;
-
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+  // -------------------- PASSENGER CARD --------------------
+  Widget _buildPassengerCard(BuildContext context, FlightSearchState state) {
+    return _sectionCard(
+      child: ListTile(
+        onTap: () => _showPassengers(context, state.passengers),
+        title: const Text(
+          'Travellers + Special Fares',
+          style: TextStyle(fontSize: 13, color: Colors.grey),
+        ),
+        subtitle: Text(
+          '${state.passengers} Passenger(s)',
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        trailing: const Icon(Icons.chevron_right),
       ),
-      builder: (context) => StatefulBuilder(
-        builder: (context, setState) {
-          return Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text(
-                  'Select Passengers',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    IconButton(
-                      onPressed: selectedPassengers > 1
-                          ? () => setState(() => selectedPassengers--)
-                          : null,
-                      icon: const Icon(Icons.remove_circle_outline),
-                    ),
-                    Text(
-                      '$selectedPassengers',
-                      style: const TextStyle(fontSize: 20),
-                    ),
-                    IconButton(
-                      onPressed: selectedPassengers < 9
-                          ? () => setState(() => selectedPassengers++)
-                          : null,
-                      icon: const Icon(Icons.add_circle_outline),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    context.read<FlightSearchBloc>().add(
-                      UpdatePassengers(selectedPassengers),
-                    );
-                    Navigator.pop(context);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF0047AB),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: const Text(
-                    'Done',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ],
-            ),
-          );
+    );
+  }
+
+  // -------------------- PAYMENT CARD --------------------
+  Widget _buildPaymentCard() {
+    return _sectionCard(
+      child: PaymentSelector(
+        selectedOption: 'Cash',
+        onSelected: (value) {
+          // Handle selected payment option here
+          print('Selected payment: $value');
         },
       ),
     );
   }
 
+  // -------------------- CURRENCY CARD --------------------
+  Widget _buildCurrencyCard() {
+    return _sectionCard(
+      child: ListTile(
+        title: const Text(
+          'Currency',
+          style: TextStyle(fontSize: 13, color: Colors.grey),
+        ),
+        subtitle: const Text(
+          'taka',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        trailing: const Icon(Icons.chevron_right),
+      ),
+    );
+  }
+
+  // -------------------- TAG BUTTONS --------------------
+  Widget _buildTagButtons() {
+    return Wrap(
+      spacing: 8,
+      children: [
+        _chip('6Exclusive'),
+        _chip('Students'),
+        _chip('Family & Friends'),
+      ],
+    );
+  }
+
+  Widget _chip(String label) {
+    return Chip(
+      label: Text(label),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      backgroundColor: Colors.grey[200],
+    );
+  }
+
+  // -------------------- SEARCH BUTTON --------------------
+  Widget _buildSearchButton(BuildContext context, FlightSearchState state) {
+    return SizedBox(
+      width: double.infinity,
+      height: 50,
+      child: ElevatedButton.icon(
+        onPressed: () => _searchFlights(context, state),
+        icon: const Icon(Icons.search),
+        label: const Text('Search Flights'),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.blue,
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // -------------------- REUSABLE SECTION CARD --------------------
+  Widget _sectionCard({required Widget child}) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: child,
+    );
+  }
+
+  // -------------------- PASSENGER SELECTOR --------------------
+  void _showPassengers(BuildContext context, int current) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+      ),
+      builder: (_) => PassengerSelector(currentPassengers: current),
+    );
+  }
+
+  // -------------------- DATE PICKER --------------------
+  Future<void> _pickDate(BuildContext context, FlightSearchState state) async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate:
+          state.departureDate ?? DateTime.now().add(const Duration(days: 1)),
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
+    );
+    if (picked != null) {
+      context.read<FlightSearchBloc>().add(SelectDate(picked));
+    }
+  }
+
+  // -------------------- SEARCH FUNCTION --------------------
   void _searchFlights(BuildContext context, FlightSearchState state) {
     if (state.fromAirport == null ||
         state.toAirport == null ||
@@ -254,12 +225,10 @@ class FlightSearchScreen extends StatelessWidget {
       context: context,
       builder: (_) => AlertDialog(
         title: const Text('Search Details'),
-        content: Text('''
-From: ${state.fromAirport!.displayName}
+        content: Text('''From: ${state.fromAirport!.displayName}
 To: ${state.toAirport!.displayName}
 Date: ${DateFormat('dd MMM yyyy').format(state.departureDate!)}
-Passengers: ${state.passengers}
-        '''),
+Passengers: ${state.passengers}'''),
       ),
     );
   }

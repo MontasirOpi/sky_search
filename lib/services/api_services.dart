@@ -22,8 +22,8 @@ class AirportService {
             },
           );
 
-      developer.log('📡 Response Status: ${response.statusCode}');
-      developer.log('📦 Response Body Length: ${response.body.length} bytes');
+      developer.log('Response Status: ${response.statusCode}');
+      developer.log('Response Body Length: ${response.body.length} bytes');
 
       if (response.statusCode == 200) {
         try {
@@ -31,7 +31,7 @@ class AirportService {
           developer.log('Successfully parsed ${data.length} airports');
 
           if (data.isEmpty) {
-            developer.log('⚠️ Warning: API returned empty array');
+            developer.log('Warning: API returned empty array');
             return [];
           }
 

@@ -4,7 +4,7 @@ import 'package:sky_search/screens/airportSearchScreen/airport_search_screen.dar
 
 class AirportSelector extends StatelessWidget {
   final String label;
-  final IconData icon;
+  final IconData? icon;
   final Airport? selectedAirport;
   final List<Airport> airports;
   final Function(Airport) onSelect;
@@ -12,10 +12,12 @@ class AirportSelector extends StatelessWidget {
   const AirportSelector({
     Key? key,
     required this.label,
-    required this.icon,
+    this.icon,
     required this.selectedAirport,
     required this.airports,
     required this.onSelect,
+    required TextStyle labelStyle,
+    required TextStyle textStyle,
   }) : super(key: key);
 
   @override
@@ -31,14 +33,6 @@ class AirportSelector extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: const Color(0xFF0047AB).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(icon, color: const Color(0xFF0047AB), size: 24),
-            ),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -56,14 +50,14 @@ class AirportSelector extends StatelessWidget {
                   Text(
                     selectedAirport?.displayName ?? 'Select airport',
                     style: const TextStyle(
-                      fontSize: 16,
+                      fontSize: 12,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                 ],
               ),
             ),
-            Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey[400]),
+            //Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey[400]),
           ],
         ),
       ),
