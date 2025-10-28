@@ -7,6 +7,7 @@ import 'package:sky_search/screens/searchScreen/bloc/search_screen_state.dart';
 import 'package:sky_search/screens/searchScreen/widgets/flight_info_card.dart';
 import 'package:sky_search/screens/searchScreen/widgets/passenger_section_bottom_sheet.dart';
 import 'package:sky_search/screens/searchScreen/widgets/payment_section.dart';
+import 'package:sky_search/screens/searchScreen/widgets/search_deatles_dialog.dart';
 
 class FlightSearchScreen extends StatelessWidget {
   const FlightSearchScreen({super.key});
@@ -40,7 +41,7 @@ class FlightSearchScreen extends StatelessWidget {
               _buildPassengerCard(context, state),
               const SizedBox(height: 12),
               _buildPaymentCard(),
-              const SizedBox(height: 12),
+              const SizedBox(height: 18),
 
               _buildSearchButton(context, state),
             ],
@@ -143,7 +144,7 @@ class FlightSearchScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -194,7 +195,6 @@ class FlightSearchScreen extends StatelessWidget {
       return;
     }
 
-    // Prevent searching when from and to are the same
     if (state.fromAirport!.code == state.toAirport!.code) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -207,13 +207,7 @@ class FlightSearchScreen extends StatelessWidget {
 
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Search Details'),
-        content: Text('''From: ${state.fromAirport!.displayName}
-To: ${state.toAirport!.displayName}
-Date: ${DateFormat('dd MMM yyyy').format(state.departureDate!)}
-Passengers: ${state.passengers}'''),
-      ),
+      builder: (_) => SearchDetailsDialog(state: state),
     );
   }
 }

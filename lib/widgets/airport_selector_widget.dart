@@ -10,7 +10,7 @@ class AirportSelector extends StatelessWidget {
   final Function(Airport) onSelect;
 
   const AirportSelector({
-    Key? key,
+    super.key,
     required this.label,
     this.icon,
     required this.selectedAirport,
@@ -18,7 +18,7 @@ class AirportSelector extends StatelessWidget {
     required this.onSelect,
     required TextStyle labelStyle,
     required TextStyle textStyle,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -6,8 +6,7 @@ import 'package:sky_search/screens/searchScreen/bloc/search_screen_event.dart';
 class PassengerSelector extends StatefulWidget {
   final int currentPassengers;
 
-  const PassengerSelector({Key? key, required this.currentPassengers})
-    : super(key: key);
+  const PassengerSelector({super.key, required this.currentPassengers});
 
   @override
   State<PassengerSelector> createState() => _PassengerSelectorState();
@@ -18,6 +17,8 @@ class _PassengerSelectorState extends State<PassengerSelector> {
   int senior = 0;
   int child = 0;
   int infant = 0;
+
+  String selectedFare = '6EExclusive'; // default selected fare
 
   @override
   void initState() {
@@ -87,17 +88,27 @@ class _PassengerSelectorState extends State<PassengerSelector> {
       );
     }
 
-    Widget fareChip(String label, {bool selected = false}) {
-      return Chip(
-        label: Text(
-          label,
-          style: TextStyle(
-            color: selected ? Colors.white : Colors.black87,
-            fontWeight: FontWeight.w500,
+    Widget fareChip(String label) {
+      final isSelected = selectedFare == label;
+      return GestureDetector(
+        onTap: () {
+          setState(() {
+            selectedFare = label;
+          });
+        },
+        child: Chip(
+          label: Text(
+            label,
+            style: TextStyle(
+              color: isSelected ? Colors.white : Colors.black87,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          backgroundColor: isSelected ? Colors.blue : Colors.grey[200],
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
           ),
         ),
-        backgroundColor: selected ? Colors.blue : Colors.grey[200],
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       );
     }
 
@@ -127,14 +138,14 @@ class _PassengerSelectorState extends State<PassengerSelector> {
             ),
           ),
           const SizedBox(height: 16),
-          // Fare Chips
+          // Fare Chips (clickable)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Wrap(
               spacing: 8,
               runSpacing: 8,
               children: [
-                fareChip('6EExclusive', selected: true),
+                fareChip('6EExclusive'),
                 fareChip('Students'),
                 fareChip('Family & Friends'),
                 fareChip('Unaccompanied Minor'),

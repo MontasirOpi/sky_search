@@ -9,7 +9,7 @@ void main() {
 }
 
 class SkySearchApp extends StatelessWidget {
-  const SkySearchApp({Key? key}) : super(key: key);
+  const SkySearchApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -18,13 +18,7 @@ class SkySearchApp extends StatelessWidget {
       child: MaterialApp(
         title: 'SkySearch',
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF0047AB)),
-          primaryColor: const Color(0xFF0047AB),
-          scaffoldBackgroundColor: const Color(0xFFF5F7FA),
-          fontFamily: 'Roboto',
-          useMaterial3: true,
-        ),
+
         home: const FlightSearchScreen(),
       ),
     );
