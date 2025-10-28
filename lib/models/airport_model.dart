@@ -1,25 +1,31 @@
 class Airport {
-  final String name;
-  final String city;
-  final String country;
-  final String iata;
+  final String code;
+  final String airportName;
+  final String cityName;
+  final String cityCode;
+  final String countryName;
+  final String searchContents;
 
   Airport({
-    required this.name,
-    required this.city,
-    required this.country,
-    required this.iata,
+    required this.code,
+    required this.airportName,
+    required this.cityName,
+    required this.cityCode,
+    required this.countryName,
+    required this.searchContents,
   });
 
   factory Airport.fromJson(Map<String, dynamic> json) {
     return Airport(
-      name: json['name'] ?? '',
-      city: json['city'] ?? '',
-      country: json['country'] ?? '',
-      iata: json['iata'] ?? '',
+      code: json['code'] ?? '',
+      airportName: json['airport_name'] ?? '',
+      cityName: json['city_name'] ?? '',
+      cityCode: json['city_code'] ?? '',
+      countryName: json['country_name'] ?? '',
+      searchContents: json['search_contents'] ?? '',
     );
   }
 
-  String get displayName => '$city ($iata)';
-  String get fullName => '$name, $city';
+  String get displayName => '$cityName ($code)';
+  String get fullName => '$airportName, $cityName';
 }
